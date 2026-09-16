@@ -171,10 +171,14 @@ vaccine_data |>
 
 State your favorite plot, why you like it better than the other two, and what you can learn from your favorite plot.  Create an alt text description of your favorite plot, using the Four Ingredient Model.  See [this link](https://drive.google.com/file/d/1BuEbL6vETBcFULmtlrwwZBUYhdEg0Zqb/view?usp=sharing) for reminders and references about alt text.
 
+My favorite plot is the first plot. This is because I think it is the easiest to comprehend and it's visually the most appealing. From this box plot, we can see a general trend that the more rural a county is, the less likely it is for the inhabitants of that county are to be vaccinated.
+
+This plot depicts a boxplot showing the relationship between the rural/urban code of a county, and the percentage of the inhabitants of those counties that are completely vaccinated. On the x-axis is the rural/urban codes, which range from 1 (most urban) to 9 (most rural), and there is a boxplot for each of these 9 codes. On the y-axis is the percent of each county that is completely vaccinated, which ranges from about 0% vaccinated to about 85% vaccinated. The general trend that we can spot from the plot is that the more rural a county is, the less vaccinated that county is likely to be. So the most urban counties (with a code of 1) are the most vaccinated, as their average percentage that is completely vaccinated is a little over 50%. Meanwhile, the most rural counties (with a code of 9) have an average percentage that is completely vaccinated that is about 40%.
+
 
 5. BEFORE running the code below, sketch the plot that will be produced by R.  AFTER running the code, describe what conclusion(s) can we draw from this plot?  
 
-This plot shows the voting variation among the ten states with the most counties. States towards the bottom of the y axis had most of its counties not vote for Biden, suggesting that these are stronger Republican states. Meanwhile, states toward the top of the y axis 
+This plot shows the voting variation among the ten states with the most counties. States towards the bottom of the y axis had most of its counties not vote for Biden, suggesting that these are stronger Republican states. Meanwhile, states toward the top of the y axis are more of a mixed bag; there are some counties in these states that voted very strongly for Biden, while other counties in the state voted very strongly against Biden. These kind of states might be more purple/battleground states.
 
 ```{r}
 #| eval: FALSE
@@ -219,7 +223,7 @@ midwest_tib
 
 b) Use your tibble in (a) to produce a plot of the relationship between proportion of Metro counties and median unemployment rate.  Points should be colored by the number of different `rural_urban_code`s in a state, but a single linear trend should be fit to all points.  What can you conclude from the plot?
 
-From the plot, we can conclude that the more unique rural and urban codes a state has, the higher the median unemployment in the state.
+From the plot, we can conclude that a higher proportion of metro counties in a state is associated with a higher median unemployment rate in the state. There doesn't appear to be a super clear trend with number of different rural/urban codes, but we can roughly see a slight association that for the more unique rural/urban codes a state has, the higher the median unemployment rate.
 
 ```{r}
 midwest_tib |>
@@ -263,12 +267,19 @@ temp <- vaccine_data |>
 
 a) Describe the tibble `temp` created above.  What would be the dimensions?  What do rows and columns represent?
 
+The tibble created above would have 3 rows, since `cut_number` creates 3 groups, and 4 columns. The 4 columns would be MD_group, n, mean_perc_vac, and mean_white. Each row represent one of the 3 groups we created from people_per_MD. The first column, MD_group, identifies each group we created, then the n column tells us how many people are in each group, the mean_perc_vac column tells us the mean percentage vaccinated for each group, and mean_white tells us the mean percentage of white people for each group.
+
 b) What would happen if we replaced `new_perc_vac = ifelse(perc_complete_vac > 95, NA, perc_complete_vac)` with `new_perc_vac = ifelse(perc_complete_vac > 95, perc_complete_vac, NA)`?
+
+If we replaced `new_perc_vac = ifelse(perc_complete_vac > 95, NA, perc_complete_vac)` with `new_perc_vac = ifelse(perc_complete_vac > 95, perc_complete_vac, NA)`, then instead of replacing the perc_complete_vac of all the counties with a perc_complete_vac > 95 with an NA, we would replace the perc_complete_vac of every county with a perc_complete_vac < 95 with an NA.
 
 c) What would happen if we replaced `mean_white = mean(perc_white, na.rm = TRUE)` with `mean_white = mean(perc_white)`?
 
+If we replaced `mean_white = mean(perc_white, na.rm = TRUE)` with `mean_white = mean(perc_white)`, NA will be returned as the mean_white value for a group if there are any NA values under the perc_white column for any of the observational units in a group.
+
 d) What would happen if we removed `group_by(MD_group)`?
 
+If we removed `group_by(MD_group)`, we would no longer have summary data for three groups. Instead, we would have n, mean_perc_vac, and mean_white for the whole dataset.
 
 9. Hypothetical R chunk #2:
 
@@ -295,12 +306,17 @@ vaccine_data |>
 
 a) Why would the first plot produce an error?
 
-The first plot produces an error because 
+The first plot produces an error because there are no aesthetic mappings supplied in the geom_smooth layer of the plot. Only the geom_point layer of the plot has aesthetic mappings supplied.
  
 b) Describe the tibble `temp` created above.  What would be the dimensions?  What do rows and columns represent?
 
+The tibble created above would have 3 rows and 2 columns. There would be 3 rows because `slice_head(n = 3)` takes the top 3 rows, and there are 2 columns, which would be HR_party and var1. The HR_party column comes from grouping by HR_party, and the var1 column comes from `summarise(var1 = n())`. Additionally, the 3 rows selected would have the 3 most common values for HR_party among the whole dataset, because of the line `arrange(desc(var1))`.
+
 c) What would happen if we replaced `fct_reorder(HR_party, perc_over_65, .fun = median)` with `HR_party`?
 
+The order that the HR_party variable is displayed on the plot would change. Without `fct_reorder`, HR_party will be plotted in the order it appears in the dataset, rather than the median value of each group's perc_over_65 value.
+
+If we replaced `fct_reorder(HR_party, perc_over_65, .fun = median)` with `HR_party`, then 
 
 10. Hypothetical R chunk #3:
 
@@ -320,8 +336,16 @@ vaccine_data |>
 
 a) Describe the tibble piped into the ggplot above.  What would be the dimensions?  What do rows and columns represent?
 
+This tibble has 45 rows and 3 columns. There are 45 rows because we're grouping by state_lump and rural_urban_code. This means that we're taking the 4 states with the most counties, and grouping together the counties with the same rural_urban_code in each of these 4 states. And then all other counties in the dataset are lumped together based on their rural_urban_code. The total number of rows in the dataset can be represented by $5 \times 9$, since we have 4 states + other = 5, and then 9 codes for each of these 5 groups. There are 3 columns, which are state, rural_urban_code, and mean_people_per_MD. 
+
 b) Carefully describe the plot created above.
+
+On the x-axis of the plot would be the variable rural_urban_code, which ranges from 1 to 9. Then, on the y-axis would be mean_people_per_MD. Then, there's a line to represent each state, and the color of each line is matches up with the legend so that the state that has the largest mean_people_per_MD with an area code of 9 is at the top of the legend, and the state with the smallest mean_people_per_MD with an area code of 9 is at the bottom of the legend.
 
 c) What would happen if we removed `filter(!is.na(people_per_MD))`?
 
+If we removed `filter(!is.na(people_per_MD))`, then mean_people_per_MD would show NA for any of the groups that have a row with NA for the people_per_MD variable.
+
 d) What would happen if we replaced `fct_reorder2(state_lump, rural_urban_code, mean_people_per_MD)` with `state_lump`?
+
+If we replaced `fct_reorder2(state_lump, rural_urban_code, mean_people_per_MD)` with `state_lump`, then the plot would be more difficult to read. The order of the states in the legned wouldn't match up with the order of each state's line on the plot when rural_urban_code = 9.
