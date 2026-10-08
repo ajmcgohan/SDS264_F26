@@ -1,0 +1,33 @@
+---
+title: "Mini Project 1"
+author: "Alex McGohan"
+format:
+  html: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(tidytext)
+library(textdata)
+library(wordcloud)
+library(readr)
+SB57_merged_labeled <- read_csv("~/SDS264_F26/SB57_merged_labeled.csv")
+
+# One word per row
+SB57_tidy <- SB57_merged_labeled |>
+  unnest_tokens(word, text, token = "words") |>
+
+# Only Eagle fans comments
+SB57_eagles <- SB57_tidy |>
+  filter(flair == )
+```
+
+```{r}
+# Most common words
+SB57_tidy |>
+  anti_join(stop_words) |>
+  count(word, sort = TRUE)
+```
+
