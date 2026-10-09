@@ -17,17 +17,107 @@ SB57_merged_labeled <- read_csv("~/SDS264_F26/SB57_merged_labeled.csv")
 
 # One word per row
 SB57_tidy <- SB57_merged_labeled |>
-  unnest_tokens(word, text, token = "words") |>
+  unnest_tokens(word, text, token = "words")
+
+# No stop words
+SB57_no_stop_words <- SB57_tidy |>
+  anti_join(stop_words) 
+  
+# Names
+SB57_names <- SB57_tidy |>
+  filter(str_detect(word, "hurts|mahomes|kelce|reid|chiefs|eagles|andy|kc"))
 
 # Only Eagle fans comments
 SB57_eagles <- SB57_tidy |>
-  filter(flair == )
+  filter(str_detect(flair, ":Eagles: Eagles" ))
+
+# Only Chief fans comments
+SB57_chiefs <- SB57_tidy |>
+  filter(str_detect(flair, ":Chiefs: Chiefs"))
 ```
 
 ```{r}
 # Most common words
-SB57_tidy |>
-  anti_join(stop_words) |>
+SB57_no_stop_words |>
   count(word, sort = TRUE)
+```
+
+```{r}
+# Word Cloud
+common_words <- SB57_no_stop_words |>
+  filter(!str_detect(word, "[a-z]+’[a-z]+")) |>
+  count(word) |>
+  filter(word != "NA") |>
+  arrange(desc(n))
+
+wordcloud(
+  words = common_words$word, 
+  freq = common_words$n, 
+  max.words = 50, 
+  random.order = FALSE
+)
+
+common_words_no_names <- common_words |>
+  anti_join(SB57_names) |>
+  filter(!str_detect(word, "\\d"))
+
+wordcloud(
+  words = common_words_no_names$word,
+  freq = common_words_no_names$n,
+  max.words = 50,
+  random.order = FALSE
+)
+```
+
+```{r}
+# Most negative and most positive words
+bing_sentiments <- get_sentiments("bing")
+
+get_sentiments("bing") |>
+  filter(sentiment == "positive") |>
+  inner_join(SB57_no_stop_words) |>
+  count(word, sort = TRUE)
+
+get_sentiments("bing") |> 
+  filter(sentiment == "negative") |>
+  inner_join(SB57_no_stop_words) |>
+  anti_join(SB57_names) |>
+  count(word, sort = TRUE)
+```
+
+```{r}
+# Plot of 10 most negative and 10 most positive words
+
+SB57_no_stop_words |>
+  inner_join(bing_sentiments) |>
+  anti_join(SB57_names) |>
+  filter(!str_detect(word, "super")) |>
+  count(sentiment, word, sort = TRUE) |>
+  group_by(sentiment) |>
+  slice_max(n, n = 10) |>
+  ungroup() |>
+  ggplot(aes(x = fct_reorder(word, n), y = n, fill = sentiment)) +
+    geom_col() +  
+    coord_flip() +
+    facet_wrap(~ sentiment, scales = "free") +
+  labs(x = "Count",
+       y = "Word",
+       fill = "Sentiment")
+```
+
+```{r}
+# Bar plot of average comment length for chiefs and eagle fans
+
+SB57_merged_labeled |>
+  filter(str_detect(flair, "^:Eagles: Eagles$|^:Chiefs: Chiefs$")) |>
+  mutate(length_comment = str_count(text, "\\b[^ ]+\\b")) |>
+  group_by(flair) |>
+  summarise(mean_length = mean(length_comment)) |>
+  ggplot(aes(x = flair, y = mean_length, fill = flair)) +
+    geom_col() +
+    labs(x = "Team",
+         y = "Mean Comment Length",
+         fill = "Team") +
+  scale_fill_manual(values = c(":Chiefs: Chiefs" = "#E31837", ":Eagles: Eagles" = "#004C54"))
 ```
 
