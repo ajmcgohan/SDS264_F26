@@ -137,7 +137,7 @@ SB57_merged_labeled |>
 
 Figure 4 is a column chart showing the average number of words per comment by Chiefs fans and Eagles fans. On the x-axis is team, with the two teams in the chart being the Kansas City Chiefs and the Philadelphia Eagles. On the y-axis is the average number of words per comment, which ranges between 14 and 19 words. Chiefs fans have an average word count of about 14 for their comments, while Eagles fans have an average word count of about 19 for their comments. This chart tells us that Eagles fans have longer comments on average, compared to Chiefs fans. We don't have a clear reason for this relationship, but from what we have seen, many of the comments have negative sentiments. Since the Eagles lost, Eagles fans may have been more inclined to share more of their negative thoughts about the team and the game than Chiefs fans.
 
-```{r, echo=FALSE, message=FALSE, out.width='150%', fig.cap="Figure 5: Column chart showing the average afinn sentiment score for the comments of each fanbase."}
+```{r, echo=FALSE, message=FALSE, out.width='120%', fig.cap="Figure 5: Column chart showing the average afinn sentiment score for the comments of each fanbase."}
 
 # The average Afinn sentiment by team, with the Chiefs and Eagles highlighted for ease of comparison
 
