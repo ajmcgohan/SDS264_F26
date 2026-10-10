@@ -1,8 +1,7 @@
 ---
 title: "SDS264 Mini-Project 1: Text Analysis of NFL Fans"
 author: "Alex McGohan"
-format:
-  html: default
+format: pdf
 editor_options: 
   chunk_output_type: console
 ---
