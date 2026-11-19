@@ -1,0 +1,253 @@
+---
+title: "R Tip of the Day"
+subtitle: "The plotrix Package"
+author: "Alex McGohan"
+format: 
+  revealjs:
+    theme: dracula
+    incremental: true
+    slide-number: true
+    chalkboard:
+      buttons: true
+    preview-links: auto
+editor_options:
+  chunk_output_type: console
+---
+```{r}
+library(tidyverse)
+library(plotrix)
+library(nycflights13)
+library(readr)
+
+titanic <- read_csv("~/Desktop/titanic3 (1).csv")
+titanic <- titanic |>
+  mutate(age_cat = ifelse(age > 17, "Adult", "Child"))
+
+titanic_df <- titanic |>
+  as.data.frame()
+
+flights <- flights |>
+  mutate(on_time = ifelse(arr_delay > 0, 0, 1))
+
+flights_df <- as.data.frame(flights[!is.na(flights$on_time), ])
+
+  
+  
+top_carriers <- flights |>
+  count(carrier, sort = TRUE) |>
+  slice_head(n = 5) |>
+  pull(carrier)
+
+flights_df_top5 <- flights |>
+  filter(carrier %in% top_carriers, !is.na(on_time)) |>
+  as.data.frame()
+```
+
+## What is Plotrix
+
+* plotrix allows its user to make specialized plots and complex visualizations
+* Much of what plotrix can do is possible with ggplot, but plotrix makes things significantly easier
+
+## Warning!
+Have to use a data frame, not a tibble.
+```{.r code-line-numbers="|2"}
+titanic_df <- titanic |>
+  as.data.frame()
+```
+
+## Building a Nested Hierarchical Bar Plot
+
+```{.r code-line-numbers="1|2-3|4|5-6|7"}
+barNest(
+  survived ~ pclass + sex,
+  data = titanic_df,
+  FUN = c("propbrk", "binciWu", "binciWl", "valid.n"),   
+  main = "Titanic Survival by Class and Sex",
+  ylab = "Proportion Survived",
+  shrink = 0.15
+)
+```
+
+## Building a Nested Hierarchical Bar Plot
+
+```{r}
+barNest(
+  survived ~ pclass + sex,
+  data = titanic_df,
+  FUN = c("propbrk", "binciWu", "binciWl", "valid.n"),   
+  main = "Titanic Survival by Class and Sex",
+  ylab = "Proportion Survived",
+  shrink = 0.15
+)
+```
+
+
+## Adding Color
+
+```{.r code-line-numbers="8-12"}
+barNest(
+  survived ~ pclass + sex,
+  data = titanic_df,
+  FUN = c("propbrk", "binciWu", "binciWl", "valid.n"),   
+  main = "Titanic Survival by Class and Sex",
+  ylab = "Proportion Survived",
+  shrink = 0.15,
+  col = list(
+    "lightgray",
+    c("navy","red4","darkgreen"),
+    c("pink","lightblue")
+  )
+)
+```
+
+## Adding Color
+```{r}
+barNest(
+  survived ~ pclass + sex,
+  data = titanic_df,
+  FUN = c("propbrk", "binciWu", "binciWl", "valid.n"),   
+  main = "Titanic Survival by Class and Sex",
+  ylab = "Proportion Survived",
+  shrink = 0.15,
+  col = list(
+    "lightgray",
+    c("navy","red4","darkgreen"),
+    c("pink","lightblue")
+  )
+)
+```
+
+## Another One (Variable)
+```{.r code-line-numbers="2|11"}
+barNest(
+  survived ~ pclass + age_cat + sex,
+  data = titanic_df,
+  FUN = c("propbrk", "binciWu", "binciWl", "valid.n"),   
+  main = "Titanic Survival by Class and Sex",
+  ylab = "Proportion Survived",
+  shrink = 0.1,
+  col = list(
+  "lightgray",
+  c("navy","red4","darkgreen"),
+  c("gold","coral"),
+  c("pink", "lightblue")
+  )
+)
+```
+
+## Another One (Variable)
+```{r}
+barNest(
+  survived ~ pclass + age_cat + sex,
+  data = titanic_df,
+  FUN = c("propbrk", "binciWu", "binciWl", "valid.n"),   
+  main = "Titanic Survival by Class and Sex",
+  ylab = "Proportion Survived",
+  shrink = 0.1,
+  col = list(
+  "lightgray",
+  c("navy","red4","darkgreen"),
+  c("gold","coral"),
+  c("pink", "lightblue")
+  )
+)
+```
+
+## Clock Plots {auto-animate="true}
+
+```r
+flights_hourly <- flights |>
+  count(hour) |>
+  as.data.frame()
+```
+
+## Clock Plots {auto-animate="true}
+
+```r
+clock24.plot(
+  lengths = flights_hourly$n,
+  clock.pos = flights_hourly$hour,
+  rp.type = "r",
+  main = "NYC Flights Departure Times (By Hour)",
+  line.col = "darkblue",
+  lwd = "7",
+  show.grid.labels = 3
+)
+```
+
+## Clock Plots
+```{r}
+flights_hourly <- flights |>
+  count(hour) |>
+  as.data.frame()
+
+clock24.plot(
+  lengths = flights_hourly$n,
+  clock.pos = flights_hourly$hour,
+  rp.type = "r",
+  main = "NYC Flights Departure Times (By Hour)",
+  line.col = "darkblue",
+  lwd = "7",
+  show.grid.labels = 3
+)
+```
+## 3D Pie Charts (Exploding)
+
+```{r}
+titanic_class <- titanic |>
+  count(pclass
+        )
+```
+
+```{.r code-line-numbers="5-7"}
+pie3D(
+  titanic_class$n, 
+  labels = c("1st Class", "2nd Class", "3rd Class"),
+  main = "Pie Chart of Titanic Passenger Class Distribution",
+  explode = 0,
+  theta = 0.9,
+  start = pi/2,
+  col = c("salmon","navy","lightblue")
+  )
+```
+
+```{r}
+pie3D(
+  titanic_class$n, 
+  labels = c("1st Class", "2nd Class", "3rd Class"),
+  main = "Pie Chart of Titanic Passenger Class Distribution",
+  explode = 0,
+  theta = 0.9,
+  start = pi/2,
+  col = c("salmon","navy","lightblue")
+  )
+```
+## Exploding
+
+```{.r line-code-numbers="|5"}
+pie3D(
+  titanic_class$n, 
+  labels = c("1st Class", "2nd Class", "3rd Class"),
+  main = "Pie Chart of Titanic Passenger Class Distribution",
+  explode = 0.75,
+  theta = 0.9,
+  start = pi/2,
+  col = c("salmon","navy","lightblue")
+  )
+```
+
+## Exploding
+
+```{r}
+pie3D(
+  titanic_class$n, 
+  labels = c("1st Class", "2nd Class", "3rd Class"),
+  main = "Pie Chart of Titanic Passenger Class Distribution",
+  explode = 0.75,
+  theta = 0.9,
+  start = pi/2,
+  col = c("salmon","navy","lightblue")
+  )
+```
+
+# Thank You!
