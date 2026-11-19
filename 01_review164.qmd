@@ -1,9 +1,8 @@
 ---
 title: 'Review of Data Science 1'
-format:
-  html: default
-editor_options: 
-  chunk_output_type: console
+format: pdf
+html: default
+chunk_output_type: console
 ---
 
 You can download this .qmd file from [here](https://github.com/proback/264_fall_2026/blob/main/01_review164.qmd).  Just hit the Download Raw File button.
@@ -315,8 +314,6 @@ The tibble created above would have 3 rows and 2 columns. There would be 3 rows 
 c) What would happen if we replaced `fct_reorder(HR_party, perc_over_65, .fun = median)` with `HR_party`?
 
 The order that the HR_party variable is displayed on the plot would change. Without `fct_reorder`, HR_party will be plotted in the order it appears in the dataset, rather than the median value of each group's perc_over_65 value.
-
-If we replaced `fct_reorder(HR_party, perc_over_65, .fun = median)` with `HR_party`, then 
 
 10. Hypothetical R chunk #3:
 
